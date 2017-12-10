@@ -31,7 +31,7 @@
      based on the wind speed.
   </p>
   <p>The JSON file is located at:
-    <a href="data/hurricanes.geojson">data/hurricanes.geojson</a>
+    <a href="https://github.com/lia3IL/lia3IL.github.io/blob/master/NRHP_Midwest_Region.geojson">data/hurricanes.geojson</a>
   </p>
 
   <div id="mapContainer" style="width:540px; height:334px;float:left"></div>
@@ -70,26 +70,7 @@ function HashTable(rows) {
     return typeof (this.data[in_key]) !== 'undefined';
   };
 }
-function defineColors() {
-  colors = new HashTable([
-    ['Hurricane', 'Color'],
-    ['Alex', '#ff0000'],
-    ['Bonnie', '#cc00aa'],
-    ['Charley', '#ff0088'],
-    ['Danielle', '#00ff00'],
-    ['Earl', '#00cc00'],
-    ['Frances', '#448844'],
-    ['Gaston', '#0088ff'],
-    ['Hermine', '#008888'],
-    ['Ivan', '#aa8800'],
-    ['Jeanne', '#8844ff'],
-    ['Karl', '#884488'],
-    ['Lisa', '#884444'],
-    ['Nicole', '#ff88ff'],
-    ['Matthew', '#ee44cc'],
-    ['Otto', '#eeeeaa'],
-    ['Other', '#888888']]);
-  undefinedColor = colors.getItem('Other');
+
 }
 function getColor(name) {
   return (colors.getItem(name) !== undefined) ? colors.getItem(name) : undefinedColor;
