@@ -8,26 +8,14 @@
         margin-left: auto;
         margin-right: auto;
        }
-       h3 {
-         text-align: center;
-         font-family: "Georgia", serif;
-       }
-       h2 {
-         text-align: center;
-         font-family: "Verdana", sans-serif;
-      }
-      
     </style>
-     <script>
-    {
-        <canvas id="myChart1" height="300" width="500"></canvas>
-
-       }
-      <script>
   </head>
   <body>
-    <h2>MP7:</h2>
-    <h3>Mapping Central Illinois historic sites</h3>
+    <h2 style: "text-align: center; font-family: "Verdana", sans-serif; font-size: 46px;">MP7:</h2>
+    <h3 style: "text-align: center; font-family: "Georgia", serif; font-size: xx-large;">Mapping Central Illinois historic sites</h3>
+    <p style="text-align: center; font-family: Century Gothic, sans-serif;">
+      There are <b>45</b> counties in <b>Central Illinois</b>. This is a large geographical region with a varied, distinct culture and history. So, we can learn more about this culture by analyzing its historical landmarks. Below is a map documenting the <b>463</b> properties in Central Illinois listed in the <b>National Register of Historic Places</b> along with some basic information. Note that there is a limit as to how much data Google Maps can process at once, so please use the buttons underneath the map to view in-depth datasets. (Data is from 06/01/2007)
+    </p>
     <div id="map"></div>
     <script>
     var map
@@ -62,7 +50,7 @@
       });
     }
       function initMap() {
-        var centIllinois = {lat: 40.482222, lng: -89.5};
+        var centIllinois = {lat: 40.15, lng: -89.5};
         map_options = {
           zoom: 8,
           mapTypeId: google.maps.MapTypeId.HYBRID,
@@ -70,57 +58,17 @@
         }
         map_document = document.getElementById('map')
         map = new google.maps.Map(map_document,map_options);
-        geojson_url = 'datahist.geojson'
+        geojson_url = 'central_illinois.geojson'
         console.log('loading geojson')
         map.data.loadGeoJson(geojson_url, null, loadMarkers)
       }
-     var chartData = {
-    labels: ["January", "February", "March", "April", "May", "June"],
-        datasets: [
-            {
-                fillColor: "#79D1CF",
-                strokeColor: "#79D1CF",
-                data: [60, 80, 81, 56, 55, 40]
-            }
-        ]
-    };
-
-var opt = {
-    events: false,
-    tooltips: {
-        enabled: false
-    },
-    hover: {
-        animationDuration: 0
-    },
-    animation: {
-        duration: 1,
-        onComplete: function () {
-            var chartInstance = this.chart,
-                ctx = chartInstance.ctx;
-            ctx.font = Chart.helpers.fontString(Chart.defaults.global.defaultFontSize, Chart.defaults.global.defaultFontStyle, Chart.defaults.global.defaultFontFamily);
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'bottom';
-
-            this.data.datasets.forEach(function (dataset, i) {
-                var meta = chartInstance.controller.getDatasetMeta(i);
-                meta.data.forEach(function (bar, index) {
-                    var data = dataset.data[index];                            
-                    ctx.fillText(data, bar._model.x, bar._model.y - 5);
-                });
-            });
-        }
-    }
-};
- var ctx = document.getElementById("Chart1"),
-     myLineChart = new Chart(ctx, {
-        type: 'bar',
-        data: chartData,
-        options: opt
-     });
     </script>
     <script async defer
     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCZ5Kx-fbPez0aSmRcIWi0p4CGtGzteQoo&callback=initMap">
     </script>
+
+    <button id="1" style="padding:10px; cursor:pointer; margin-left: auto; margin-right: auto;">Display all sites in Central Illinois</button>
+    <button id="2" style="padding:10px; cursor:pointer; margin-left: auto; margin-right: auto;">Display sites in Western Central Illinois</button>
+    <button id="3" style="padding:10px; cursor:pointer; margin-left: auto; margin-right: auto;">Display sites in Eastern Central Illinois</button>
   </body>
 </html>
