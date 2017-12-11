@@ -2,53 +2,127 @@
 <html>
   <head>
     <style>
-      /* Always set the map height explicitly to define the size of the div
-       * element that contains the map. */
-      #map {
-        height: 100%;
+       #map {
+        height: 600px;
+        width: 800px;
+        margin-left: auto;
+        margin-right: auto;
+       }
+       h3 {
+         text-align: center;
+         font-family: "Georgia", serif;
+       }
+       h2 {
+         text-align: center;
+         font-family: "Verdana", sans-serif;
       }
-      /* Optional: Makes the sample page fill the window. */
-      html, body {
-        height: 100%;
-        margin: 0;
-        padding: 0;
-      }
+      {
+         <canvas id="myChart1" height="300" width="500"></canvas>
+    <canvas id="myChart2" height="300" width="500"></canvas>
+
+       }
     </style>
   </head>
   <body>
+    <h2>MP7:</h2>
+    <h3>Mapping Central Illinois historic sites</h3>
     <div id="map"></div>
     <script>
-      var map;
+    var map
+    var markers = []
+    // after the geojson is loaded, iterate through the map data to create markers
+    // and add the pop up (info) windows
+    function loadMarkers() {
+      console.log('creating markers')
+      var infoWindow = new google.maps.InfoWindow()
+      map.data.forEach(function(feature) {
+        // geojson format is [longitude, latitude] but google maps marker position attribute
+        // expects [latitude, longitude]
+        var latitude = feature.getGeometry().get().lat()
+        var longitude = feature.getGeometry().get().lng()
+        var titleText = feature.getProperty('Name')
+        var descriptionText = feature.getProperty('description')
+        var marker = new google.maps.Marker({
+          position: {lat: latitude, lng:longitude},
+          title: titleText,
+          map: map
+         });
+        var markerInfo = "<div><h3>" + titleText + "</h3>" + descriptionText + "</div>"
+        // by default the infoWindow for each marker will stay open unless manually closed
+        // using setContent and opening the window whenever a marker is clicked will
+        // cause the prior infoWindow to close
+        marker.addListener('click', function() {
+              infoWindow.close()
+              infoWindow.setContent(markerInfo)
+              infoWindow.open(map, marker)
+            });
+        markers.push(marker)
+      });
+    }
       function initMap() {
-        map = new google.maps.Map(document.getElementById('map'), {
-          zoom: 2,
-          center: new google.maps.LatLng(2.8,-187.3),
-          mapTypeId: 'terrain'
-        });
-
-        // Create a <script> tag and set the USGS URL as the source.
-        var script = document.createElement('script');
-        // This example uses a local copy of the GeoJSON stored at
-        // http://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_week.geojsonp
-        script.src = 'https://github.com/lia3IL/lia3IL.github.io/blob/master/NRHP_Midwest_Region.geojson';
-        document.getElementsByTagName('head')[0].appendChild(script);
-      }
-
-      // Loop through the results array and place a marker for each
-      // set of coordinates.
-      window.eqfeed_callback = function(results) {
-        for (var i = 0; i < results.features.length; i++) {
-          var coords = results.features[i].geometry.coordinates;
-          var latLng = new google.maps.LatLng(coords[1],coords[0]);
-          var marker = new google.maps.Marker({
-            position: latLng,
-            map: map
-          });
+        var centIllinois = {lat: 40.482222, lng: -89.5};
+        map_options = {
+          zoom: 8,
+          mapTypeId: google.maps.MapTypeId.HYBRID,
+          center: centIllinois
         }
+        map_document = document.getElementById('map')
+        map = new google.maps.Map(map_document,map_options);
+        geojson_url = 'datahist.geojson'
+        console.log('loading geojson')
+        map.data.loadGeoJson(geojson_url, null, loadMarkers)
       }
+      var chartData = {
+    labels: ["January", "February", "March", "April", "May", "June"],
+    datasets: [
+        {
+            fillColor: "#79D1CF",
+            strokeColor: "#79D1CF",
+            data: [60, 80, 81, 56, 55, 40]
+        }
+    ]
+};
+
+var ctx = document.getElementById("myChart1").getContext("2d");
+var myLine = new Chart(ctx).Line(chartData, {
+    showTooltips: false,
+    onAnimationComplete: function () {
+
+        var ctx = this.chart.ctx;
+        ctx.font = this.scale.font;
+        ctx.fillStyle = this.scale.textColor
+        ctx.textAlign = "center";
+        ctx.textBaseline = "bottom";
+
+        this.datasets.forEach(function (dataset) {
+            dataset.points.forEach(function (points) {
+                ctx.fillText(points.value, points.x, points.y - 10);
+            });
+        })
+    }
+});
+
+var ctx = document.getElementById("myChart2").getContext("2d");
+var myBar = new Chart(ctx).Bar(chartData, {
+    showTooltips: false,
+    onAnimationComplete: function () {
+
+        var ctx = this.chart.ctx;
+        ctx.font = this.scale.font;
+        ctx.fillStyle = this.scale.textColor
+        ctx.textAlign = "center";
+        ctx.textBaseline = "bottom";
+
+        this.datasets.forEach(function (dataset) {
+            dataset.bars.forEach(function (bar) {
+                ctx.fillText(bar.value, bar.x, bar.y - 5);
+            });
+        })
+    }
+});
     </script>
     <script async defer
-    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCZ5Kx-fbPez0aSmRcIWi0p4CGtGzteQoo&callback=initMap">>
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCZ5Kx-fbPez0aSmRcIWi0p4CGtGzteQoo&callback=initMap">
     </script>
   </body>
 </html>
