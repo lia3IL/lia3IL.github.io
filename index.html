@@ -1,148 +1,54 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
-<head>
-  <meta http-equiv="X-UA-Compatible" content="IE=8; IE=EmulateIE9; IE=EmulateIE10;"/>
-  <meta charset="utf-8"/>
-  <meta name="keywords" content="addGeoJSONContainer,getGeoJSON,onGeoJSONParsed,createGraphicsMarker" />
-  <title>HERE Maps API Example: Loading custom geoJSON data Points using AJAX: Hurricanes</title>
-  <!-- Set up constants such as APP ID and token -->
-  <script type="text/javascript" src="../libs/hereAppIdAndToken.js"></script>
-  <!-- Bootstrap jQuery Library -->
-  <script type="text/javascript" src="../libs/jQl.min.js"></script>
-
-  <!-- Asynchronously the HERE Maps API for JavaScript -->
-    <script type="text/javascript" src="../libs/hereAsyncLoader.js"
-    id="HereMapsLoaderScript" 
-    data-params="maps,datarendering" 
-    data-map-container="mapContainer"
-    data-callback="afterHereMapLoad"
-    data-libs="geojson-parser"
-    data-parent="demos/geojson-parser/">
-  </script>
-  <link rel="icon" href="http://here.com/favicon.ico"/>
-  <!--<link href="http://developer.here.com/html/css/main.css" rel="stylesheet" />-->
-</head>
-<body>
-  <h1>Loading custom styled geoJSON data Points using AJAX: Hurricanes</h1>
-  <div style="width:600px; ">
-
-  <p>This example retrieves and parses geoJSON data holding information associated with the storms of the 2004 Hurricane Season.
-    The file is loaded using AJAX. The color of each data point is associated to the legend. The size of each data point is
-     based on the wind speed.
-  </p>
-  <p>The JSON file is located at:
-    <a href="https://github.com/lia3IL/lia3IL.github.io/blob/master/NRHP_Midwest_Region.geojson">data/hurricanes.geojson</a>
-  </p>
-
-  <div id="mapContainer" style="width:540px; height:334px;float:left"></div>
-  </div>
-  <div id="legend" style="float:left; color: rgb(102, 102, 102);"><b>2004 Hurricane Season</b></div>
-  <div id="src" style="clear:both;width:100%">
-    <br/>
-      <p>The control can be loaded using the following <code>&lt;script&gt;</code> element:
-      <pre><code class="prettyprint">&lt;script type="text/javascript" charset="UTF-8" src="<a href="libs/geojson-parser.js">libs/geojson-parser.js</a>"&gt;&lt;/script></code></pre>
-  </div>
-<script id="example-code" data-categories="geojson,library" type="text/javascript" >
-//<![CDATA[
-var map,
-  infoBubbles,
-  geoJsonContainer,
-  jsonManager,
-  colors,
-  undefinedColor;
-function HashTable(rows) {
-  var that = this,
-    len = rows.length,
-    fields,
-    i;
-  that.data = {};
-  that.key = rows[0][0];
-  that.value = rows[0][1];
-  // Start from 1 since we have a header row.
-  for (i = 1; i < len; i += 1) {
-    fields = rows[i];
-    that.data[fields[0]] = fields[1];
-  }
-  that.getItem = function (in_key) {
-    return this.data[in_key];
-  };
-  that.hasItem = function (in_key) {
-    return typeof (this.data[in_key]) !== 'undefined';
-  };
-}
-
-}
-function getColor(name) {
-  return (colors.getItem(name) !== undefined) ? colors.getItem(name) : undefinedColor;
-}
-function createGraphicsMarker(datapoint, props) {
-  var graphicsContext = new nokia.maps.gfx.Graphics(),
-    diameter = ((Math.floor(props.WIND / 10)) + 4);
-  graphicsContext.beginImage(diameter, diameter);
-  graphicsContext.set('fillColor', nokia.maps.gfx.Color.parseCss(getColor(props.NAME), 0.5));
-  graphicsContext.set('strokeColor', '#000');
-  graphicsContext.set('lineWidth', 1);
-  graphicsContext.drawEllipse(0, 0, diameter, diameter);
-  graphicsContext.fill();
-  graphicsContext.stroke();
-  return new nokia.maps.map.Marker(datapoint, {
-    icon: new nokia.maps.gfx.GraphicsImage(graphicsContext.getIDL()),
-    visibility: true,
-    anchor: new nokia.maps.util.Point((diameter / 2), (diameter / 2))
-  });
-}
-function addGeoJSONContainer(map) {
-  geoJsonContainer = new GeoJSONContainer({
-    theme : {
-      getPointPresentation :  function (dataPoint, properties) {
-        return createGraphicsMarker(dataPoint, properties);
+  <head>
+    <style>
+      /* Always set the map height explicitly to define the size of the div
+       * element that contains the map. */
+      #map {
+        height: 100%;
       }
-    }
-  });
-  map.objects.add(geoJsonContainer);
-  var TOUCH = nokia.maps.dom.Page.browser.touch,
-    CLICK = TOUCH ? 'tap' : 'click';
-  geoJsonContainer.addListener(CLICK, function (evt) {
-    // Extract the data from the properties.
-    var text =
-      'Name: ' + evt.target.properties.NAME + '<br/>' +
-      'Date: ' + evt.target.properties.DATES + '<br/>' +
-      'Pressure: ' + evt.target.properties.PR + '<br/>' +
-      'Wind Speed: ' + evt.target.properties.WIND + '<br/>' +
-      'Status: ' + evt.target.properties.STAT;
-    infoBubbles.openBubble(text,
-       evt.target.getBoundingBox().getCenter());
-  }, false);
-}
-function getGeoJSON() {
-  var filename = 'NRHP_Midwest_Region.geojson';
-  jsonManager = new JSONManager();
-  jsonManager.parseJSON(filename);
-  jsonManager.addObserver('state', onGeoJSONParsed);
-}
-function onGeoJSONParsed() {
-  if (jsonManager.state === 'finished') {
-    var err = geoJsonContainer.addGeoJSON(jsonManager.object);
-    if (geoJsonContainer.state === 'finished') {
-      map.zoomTo(geoJsonContainer.getBoundingBox());
-    } else {
-      console.log(err);
-    }
-  }
-}
+      /* Optional: Makes the sample page fill the window. */
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="map"></div>
+    <script>
+      var map;
+      function initMap() {
+        map = new google.maps.Map(document.getElementById('map'), {
+          zoom: 2,
+          center: new google.maps.LatLng(2.8,-187.3),
+          mapTypeId: 'terrain'
+        });
 
-function afterHereMapLoad(theMap) {
-  map = theMap;
-  infoBubbles = new nokia.maps.map.component.InfoBubbles();
-  map.components.add(infoBubbles);
-  defineColors();
-  createLegend(colors.data, document.getElementById('legend'));
-  addGeoJSONContainer(map);
-  getGeoJSON();
-}
-//]]>
-</script>
-<script type="text/javascript" src="../libs/prettyprint.js"></script>
-</body>
+        // Create a <script> tag and set the USGS URL as the source.
+        var script = document.createElement('script');
+        // This example uses a local copy of the GeoJSON stored at
+        // http://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_week.geojsonp
+        script.src = 'https://github.com/lia3IL/lia3IL.github.io/blob/master/NRHP_Midwest_Region.geojson';
+        document.getElementsByTagName('head')[0].appendChild(script);
+      }
+
+      // Loop through the results array and place a marker for each
+      // set of coordinates.
+      window.eqfeed_callback = function(results) {
+        for (var i = 0; i < results.features.length; i++) {
+          var coords = results.features[i].geometry.coordinates;
+          var latLng = new google.maps.LatLng(coords[1],coords[0]);
+          var marker = new google.maps.Marker({
+            position: latLng,
+            map: map
+          });
+        }
+      }
+    </script>
+    <script async defer
+    src= src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCZ5Kx-fbPez0aSmRcIWi0p4CGtGzteQoo&callback=initMap">>
+    </script>
+  </body>
 </html>
-  
